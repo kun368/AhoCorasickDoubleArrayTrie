@@ -938,7 +938,7 @@ public class AhoCorasickDoubleArrayTrie<V> implements Serializable
                 if (allocSize <= (begin + siblings.get(siblings.size() - 1).getKey()))
                 {
                     // progress can be zero // 防止progress产生除零错误
-                    double toSize = Math.max(1.05, 1.0 * keySize / (progress + 1)) * allocSize;
+                    double toSize = Math.min(4.0, Math.max(1.05, 1.0 * keySize / (progress + 1))) * allocSize;
                     int maxSize = (int) (Integer.MAX_VALUE * 0.95);
                     if (allocSize >= maxSize) throw new RuntimeException("Double array trie is too big.");
                     else resize((int) Math.min(toSize, maxSize));
