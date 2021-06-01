@@ -842,7 +842,7 @@ public class AhoCorasickDoubleArrayTrie<V> implements Serializable
         {
             progress = 0;
             this.keySize = keySize;
-            resize(65536 * 32); // 32个双字节
+            resize(256);
 
             base[0] = 1;
             nextCheckPos = 0;
@@ -863,6 +863,8 @@ public class AhoCorasickDoubleArrayTrie<V> implements Serializable
          */
         private int resize(int newSize)
         {
+            newSize = Math.max(newSize, allocSize * 2);
+
             int[] base2 = new int[newSize];
             int[] check2 = new int[newSize];
             boolean[] used2 = new boolean[newSize];
@@ -935,13 +937,10 @@ public class AhoCorasickDoubleArrayTrie<V> implements Serializable
                 }
 
                 begin = pos - siblings.get(0).getKey(); // 当前位置离第一个兄弟节点的距离
-                if (allocSize <= (begin + siblings.get(siblings.size() - 1).getKey()))
+                int needSize = (begin + siblings.get(siblings.size() - 1).getKey());
+                if (allocSize <= needSize)
                 {
-                    // progress can be zero // 防止progress产生除零错误
-                    double toSize = Math.min(4.0, Math.max(2.0, 1.0 * keySize / (progress + 1))) * allocSize;
-                    int maxSize = (int) (Integer.MAX_VALUE * 0.95);
-                    if (allocSize >= maxSize) throw new RuntimeException("Double array trie is too big.");
-                    else resize((int) Math.min(toSize, maxSize));
+                    resize(needSize + 1);
                 }
 
                 if (used[begin])
